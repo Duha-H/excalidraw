@@ -23,6 +23,7 @@
     "fontFamily": "Schriftfamilie",
     "onlySelected": "Nur ausgewählte",
     "withBackground": "Mit Hintergrund",
+    "addWatermark": "\"Made with Excalidraw\" hinzufügen",
     "handDrawn": "Handgezeichnet",
     "normal": "Normal",
     "code": "Code",
@@ -52,7 +53,8 @@
     "createRoom": "Live-Kollaborationssitzung teilen",
     "duplicateSelection": "Duplizieren",
     "untitled": "Unbenannt",
-    "name": "Name"
+    "name": "Name",
+    "madeWithExcalidraw": "Made with Excalidraw"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -77,7 +79,9 @@
     "redo": "Wiederholen",
     "roomDialog": "Live-Kollaborationssitzung starten",
     "createNewRoom": "Neuen Raum erstellen",
-    "toggleFullScreen": "Vollbild umschalten"
+    "toggleFullScreen": "Vollbild umschalten",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",
@@ -107,7 +111,7 @@
   "hints": {
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
     "linearElementMulti": "Zum Beenden auf den letzten Punkt klicken oder Escape oder Eingabe drücken",
-    "resize": "Zum Beibehalten der Proportionen bei der Größenänderung SHIFT gedrückt halten",
+    "resize": "",
     "rotate": "Du kannst Winkel einschränken, indem du SHIFT während der Drehung gedrückt hältst"
   },
   "errorSplash": {
@@ -125,7 +129,7 @@
   },
   "roomDialog": {
     "desc_intro": "Du kannst Leute zu deiner aktuellen Zeichnung einladen um mit ihnen zusammenzuarbeiten.",
-    "desc_privacy": "Keine Sorge, die Sitzung verwendet Ende-zu-Ende-Verschlüsselung, sodass alles, was du zeichnest, privat bleibt. Nicht einmal unser Server kann einsehen was du dir einfallen lässt.",
+    "desc_privacy": "Sei beruhigt, da die Sitzung eine Ende-zu-Ende-Verschlüsselung nutzt. Alles von dir gezeichnete, privat bleibt. Auch unsere Server sehen nicht, was du dir einfallen lässt.",
     "button_startSession": "Sitzung starten",
     "button_stopSession": "Sitzung beenden",
     "desc_inProgressIntro": "Die Live-Sitzung wird nun ausgeführt.",
@@ -147,13 +151,13 @@
     "editor": "Editor",
     "view": "Ansicht",
     "blog": "Unseren Blog lesen",
-    "howto": "Folgen Sie unseren Anleitungen",
-    "github": "Ein Problem gefunden? Informieren Sie uns",
+    "howto": "Folge unseren Anleitungen",
+    "github": "Ein Problem gefunden? Informiere uns",
     "textNewLine": "Neue Zeile hinzufügen (Text)",
     "textFinish": "Bearbeiten beenden (Text)",
     "zoomToFit": "Zoomen um alle Elemente einzupassen"
   },
   "encrypted": {
-    "tooltip": "Deine Zeichnungen sind Ende-zu-Ende-verschlüsselt, sodass der Excalidraw-Server sie nie sehen wird. Klicke auf das Symbol um mehr zu erfahren..."
+    "tooltip": "Deine Zeichnungen sind Ende-zu-Ende-verschlüsselt, sodass der Excalidraw-Server sie nie sehen wird."
   }
 }

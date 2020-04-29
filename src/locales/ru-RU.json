@@ -23,6 +23,7 @@
     "fontFamily": "Семейство шрифтов",
     "onlySelected": "Только выбранные",
     "withBackground": "С фоном",
+    "addWatermark": "Добавить \"Сделано с Excalidraw\"",
     "handDrawn": "Нарисованный от руки",
     "normal": "Обычный",
     "code": "Код",
@@ -38,21 +39,22 @@
     "left": "Слева",
     "center": "Центр",
     "right": "Справа",
-    "extraBold": "",
+    "extraBold": "Очень жирная Жирная",
     "architect": "Архитектор",
     "artist": "Художник",
     "cartoonist": "Карикатурист",
     "fileTitle": "Название файла",
     "colorPicker": "Выбор цвета",
     "canvasBackground": "Фон холста",
-    "drawingCanvas": "",
+    "drawingCanvas": "Холст для рисования",
     "layers": "Слои",
     "actions": "Действия",
     "language": "Язык",
     "createRoom": "Создать многопользовательскую сессию",
     "duplicateSelection": "Дубликат",
     "untitled": "",
-    "name": "Имя"
+    "name": "Имя",
+    "madeWithExcalidraw": ""
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
@@ -77,7 +79,9 @@
     "redo": "Шаг вперед",
     "roomDialog": "Начать совместную работу",
     "createNewRoom": "Создать новую комнату",
-    "toggleFullScreen": ""
+    "toggleFullScreen": "",
+    "toggleZenMode": "",
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Это очистит весь холст. Вы уверены?",
@@ -107,7 +111,7 @@
   "hints": {
     "linearElement": "Нажмите, чтобы начать несколько точек, перетащите для одной линии",
     "linearElementMulti": "Кликните на последней точке или нажмите Escape или Enter чтобы закончить",
-    "resize": "Вы можете сохранить пропорции, удерживая SHIFT во время изменения размера",
+    "resize": "",
     "rotate": ""
   },
   "errorSplash": {

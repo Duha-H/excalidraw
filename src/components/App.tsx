@@ -74,7 +74,12 @@ import {
   sceneCoordsToViewportCoords,
   setCursorForShape,
 } from "../utils";
-import { KEYS, isArrowKey } from "../keys";
+import {
+  KEYS,
+  isArrowKey,
+  getResizeCenterPointKey,
+  getResizeWithSidesSameLengthKey,
+} from "../keys";
 
 import { findShapeByKey, shapesShortcutKeys } from "../shapes";
 import { createHistory, SceneHistory } from "../history";
@@ -164,7 +169,7 @@ const gesture: Gesture = {
 class App extends React.Component<any, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
-  portal: Portal = new Portal();
+  portal: Portal = new Portal(this);
   lastBroadcastedOrReceivedSceneVersion: number = -1;
   removeSceneCallback: SceneStateCallbackRemover | null = null;
 
@@ -190,6 +195,7 @@ class App extends React.Component<any, AppState> {
   }
 
   public render() {
+    const { zenModeEnabled } = this.state;
     const canvasDOMWidth = window.innerWidth;
     const canvasDOMHeight = window.innerHeight;
 
@@ -215,6 +221,8 @@ class App extends React.Component<any, AppState> {
             });
           }}
           onLockToggle={this.toggleLock}
+          zenModeEnabled={zenModeEnabled}
+          toggleZenMode={this.toggleZenMode}
         />
         <main>
           <canvas
@@ -269,7 +277,7 @@ class App extends React.Component<any, AppState> {
       }
       this.setState((state) => ({
         ...res.appState,
-        editingElement: editingElement || state.editingElement,
+        editingElement: editingElement || res.appState?.editingElement || null,
         isCollaborating: state.isCollaborating,
         collaborators: state.collaborators,
       }));
@@ -769,6 +777,12 @@ class App extends React.Component<any, AppState> {
     }));
   };
 
+  toggleZenMode = () => {
+    this.setState({
+      zenModeEnabled: !this.state.zenModeEnabled,
+    });
+  };
+
   private destroySocketClient = () => {
     this.setState({
       isCollaborating: false,
@@ -904,19 +918,7 @@ class App extends React.Component<any, AppState> {
         roomMatch[2],
       );
 
-      this.portal.socket!.on("init-room", () => {
-        if (this.portal.socket) {
-          const username = restoreUsernameFromLocalStorage();
-
-          this.portal.socket.emit("join-room", this.portal.roomID);
-
-          if (username !== null) {
-            this.setState({
-              username,
-            });
-          }
-        }
-      });
+      // All socket listeners are moving to Portal
       this.portal.socket!.on(
         "client-broadcast",
         async (encryptedData: ArrayBuffer, iv: Uint8Array) => {
@@ -988,9 +990,6 @@ class App extends React.Component<any, AppState> {
           };
         });
       });
-      this.portal.socket!.on("new-user", async (_socketID: string) => {
-        this.broadcastScene(SCENE.INIT);
-      });
 
       this.setState({
         isCollaborating: true,
@@ -1021,7 +1020,8 @@ class App extends React.Component<any, AppState> {
     }
   };
 
-  private broadcastScene = (sceneType: SCENE.INIT | SCENE.UPDATE) => {
+  // maybe should move to Portal
+  broadcastScene = (sceneType: SCENE.INIT | SCENE.UPDATE) => {
     const data: SocketUpdateDataSource[typeof sceneType] = {
       type: sceneType,
       payload: {
@@ -1048,6 +1048,16 @@ class App extends React.Component<any, AppState> {
     },
   );
 
+  restoreUserName() {
+    const username = restoreUsernameFromLocalStorage();
+
+    if (username !== null) {
+      this.setState({
+        username,
+      });
+    }
+  }
+
   // Input handling
 
   private onKeyDown = withBatchedUpdates((event: KeyboardEvent) => {
@@ -1068,6 +1078,14 @@ class App extends React.Component<any, AppState> {
       this.setState({
         showShortcutsDialog: true,
       });
+    }
+
+    if (
+      !event[KEYS.CTRL_OR_CMD] &&
+      event.altKey &&
+      event.keyCode === KEYS.Z_KEY_CODE
+    ) {
+      this.toggleZenMode();
     }
 
     if (event.code === "KeyC" && event.altKey && event.shiftKey) {
@@ -1807,6 +1825,7 @@ class App extends React.Component<any, AppState> {
     let draggingOccurred = false;
     let hitElement: ExcalidrawElement | null = null;
     let hitElementWasAddedToSelection = false;
+
     if (this.state.elementType === "selection") {
       const elements = globalSceneState.getElements();
       const selectedElements = getSelectedElements(elements, this.state);
@@ -2027,7 +2046,7 @@ class App extends React.Component<any, AppState> {
     }
 
     let resizeArrowFn: ResizeArrowFnType | null = null;
-    const setResizeArrrowFn = (fn: ResizeArrowFnType) => {
+    const setResizeArrowFn = (fn: ResizeArrowFnType) => {
       resizeArrowFn = fn;
     };
 
@@ -2088,7 +2107,7 @@ class App extends React.Component<any, AppState> {
           this.state,
           this.setAppState,
           resizeArrowFn,
-          setResizeArrrowFn,
+          setResizeArrowFn,
           event,
           x,
           y,
@@ -2196,7 +2215,7 @@ class App extends React.Component<any, AppState> {
           });
         }
       } else {
-        if (event.shiftKey) {
+        if (getResizeWithSidesSameLengthKey(event)) {
           ({ width, height } = getPerfectElementSize(
             this.state.elementType,
             width,
@@ -2208,9 +2227,19 @@ class App extends React.Component<any, AppState> {
           }
         }
 
+        let newX = x < originX ? originX - width : originX;
+        let newY = y < originY ? originY - height : originY;
+
+        if (getResizeCenterPointKey(event)) {
+          width += width;
+          height += height;
+          newX = originX - width / 2;
+          newY = originY - height / 2;
+        }
+
         mutateElement(draggingElement, {
-          x: x < originX ? originX - width : originX,
-          y: y < originY ? originY - height : originY,
+          x: newX,
+          y: newY,
           width: width,
           height: height,
         });

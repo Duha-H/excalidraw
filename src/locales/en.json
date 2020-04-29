@@ -79,7 +79,9 @@
     "redo": "Redo",
     "roomDialog": "Start live collaboration",
     "createNewRoom": "Create new room",
-    "toggleFullScreen": "Toggle full screen"
+    "toggleFullScreen": "Toggle full screen",
+    "toggleZenMode": "Toggle zen mode",
+    "exitZenMode": "Exit zen mode"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
@@ -109,7 +111,7 @@
   "hints": {
     "linearElement": "Click to start multiple points, drag for single line",
     "linearElementMulti": "Click on last point or press Escape or Enter to finish",
-    "resize": "You can constrain proportions by holding SHIFT while resizing",
+    "resize": "You can constrain proportions by holding SHIFT while resizing,\nhold ALT to resize from the center",
     "rotate": "You can constrain angles by holding SHIFT while rotating"
   },
   "errorSplash": {
@@ -156,6 +158,6 @@
     "zoomToFit": "Zoom to fit all elements"
   },
   "encrypted": {
-    "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them.\nClick the icon to learn more..."
+    "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them."
   }
 }
