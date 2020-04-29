@@ -33,6 +33,7 @@ import {
   isOverScrollBars,
   getElementAtPosition,
   getElementContainingPosition,
+  getSurfaceIntersection,
   getNormalizedZoom,
   getSelectedElements,
   globalSceneState,
@@ -56,6 +57,8 @@ import {
   ExcalidrawElement,
   ExcalidrawTextElement,
   ResizeArrowFnType,
+  ExcalidrawLinearElement,
+  NonDeleted,
 } from "../element/types";
 
 import { distance2d, isPathALoop } from "../math";
@@ -1472,6 +1475,9 @@ class App extends React.Component<any, AppState> {
 
       const { points, lastCommittedPoint } = multiElement;
       const lastPoint = points[points.length - 1];
+      const newPoint = this.locateGluepoint(x, y, multiElement);
+      newPoint[0] -= rx;
+      newPoint[1] -= ry;
 
       setCursorForShape(this.state.elementType);
 
@@ -1479,11 +1485,11 @@ class App extends React.Component<any, AppState> {
         // if we haven't yet created a temp point and we're beyond commit-zone
         //  threshold, add a point
         if (
-          distance2d(x - rx, y - ry, lastPoint[0], lastPoint[1]) >=
+          distance2d(newPoint[0], newPoint[1], lastPoint[0], lastPoint[1]) >=
           LINE_CONFIRM_THRESHOLD
         ) {
           mutateElement(multiElement, {
-            points: [...points, [x - rx, y - ry]],
+            points: [...points, [newPoint[0], newPoint[1]]],
           });
         } else {
           document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
@@ -1497,8 +1503,8 @@ class App extends React.Component<any, AppState> {
           points.length > 2 &&
           lastCommittedPoint &&
           distance2d(
-            x - rx,
-            y - ry,
+            newPoint[0],
+            newPoint[1],
             lastCommittedPoint[0],
             lastCommittedPoint[1],
           ) < LINE_CONFIRM_THRESHOLD
@@ -1513,7 +1519,7 @@ class App extends React.Component<any, AppState> {
           }
           // update last uncommitted point
           mutateElement(multiElement, {
-            points: [...points.slice(0, -1), [x - rx, y - ry]],
+            points: [...points.slice(0, -1), [newPoint[0], newPoint[1]]],
           });
         }
       }
@@ -2170,8 +2176,9 @@ class App extends React.Component<any, AppState> {
       if (isLinearElement(draggingElement)) {
         draggingOccurred = true;
         const points = draggingElement.points;
-        let dx = x - draggingElement.x;
-        let dy = y - draggingElement.y;
+        const newPoint = this.locateGluepoint(x, y);
+        let dx = newPoint[0] - draggingElement.x;
+        let dy = newPoint[1] - draggingElement.y;
 
         if (event.shiftKey && points.length === 2) {
           ({ width: dx, height: dy } = getPerfectElementSize(
@@ -2615,6 +2622,44 @@ class App extends React.Component<any, AppState> {
       this.state,
     );
   }, 300);
+
+  private locateGluepoint = (
+    x: number,
+    y: number,
+    multiElement?: NonDeleted<ExcalidrawLinearElement>,
+  ): number[] => {
+    // check for collisions with shape in scene (any shape to "glue" line/arrow to)
+    // TODO have this only happen when "glue-points" mode is active
+    const elements = globalSceneState.getElements();
+    if (multiElement) {
+      elements.filter((element) => {
+        return element.id !== multiElement.id; // get all elements except "current" multiElement
+      });
+    }
+    const elementInRange = getElementAtPosition(
+      elements,
+      this.state,
+      x,
+      y,
+      this.state.zoom,
+    );
+    let surfaceIntersection = [x, y]; // default, return unchanged point
+    if (
+      elementInRange &&
+      (elementInRange.type === "diamond" ||
+        elementInRange.type === "ellipse" ||
+        elementInRange.type === "rectangle")
+    ) {
+      // console.log("element in range: ", elementInRange.type);
+      surfaceIntersection = getSurfaceIntersection(
+        elementInRange,
+        x,
+        y,
+        this.state.zoom,
+      ); // returns (x, y) position of intersection on shape surface
+    }
+    return surfaceIntersection;
+  };
 }
 
 // -----------------------------------------------------------------------------

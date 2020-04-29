@@ -1,5 +1,6 @@
 import {
   distanceBetweenPointAndSegment,
+  intersectionPointOnSegment,
   isPathALoop,
   rotate,
   isPointInPolygon,
@@ -212,6 +213,87 @@ export function hitTest(
   throw new Error(`Unimplemented type ${element.type}`);
 }
 
+export function getSurfaceHitPoint(
+  element: NonDeletedExcalidrawElement,
+  x: number,
+  y: number,
+  zoom: number,
+): [number, number] {
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+  const offset = 30 / zoom;
+  // reverse rotate the pointer
+  [x, y] = rotate(x, y, cx, cy, -element.angle);
+
+  if (element.type === "rectangle") {
+    const lines = [
+      [x1, y1, x2, y1], // top
+      [x2, y1, x2, y2], // right
+      [x2, y2, x1, y2], // bottom
+      [x1, y2, x1, y1], // left
+    ];
+    const closestLine = getClosestLine(lines, x, y);
+    const intersectionPt = intersectionPointOnSegment(
+      x,
+      y,
+      closestLine[0],
+      closestLine[1],
+      closestLine[2],
+      closestLine[3],
+    );
+    // rotate point by element rotation
+    const [px, py] = rotate(
+      intersectionPt[0],
+      intersectionPt[1],
+      cx,
+      cy,
+      element.angle,
+    );
+    return [px, py];
+  } else if (element.type === "diamond") {
+    x -= element.x;
+    y -= element.y;
+    let [
+      topX,
+      topY,
+      rightX,
+      rightY,
+      bottomX,
+      bottomY,
+      leftX,
+      leftY,
+    ] = getDiamondPoints(element);
+    // TODO: remove this when we normalize coordinates globally
+    if (topY > bottomY) {
+      [bottomY, topY] = [topY, bottomY];
+    }
+    if (rightX < leftX) {
+      [leftX, rightX] = [rightX, leftX];
+    }
+    const lines = [
+      [topX, topY, rightX, rightY],
+      [rightX, rightY, bottomX, bottomY],
+      [bottomX, bottomY, leftX, leftY],
+      [leftX, leftY, topX, topY],
+    ];
+    const closestLine = getClosestLine(lines, x, y);
+    const intersectionPt = intersectionPointOnSegment(
+      x,
+      y,
+      closestLine[0],
+      closestLine[1],
+      closestLine[2],
+      closestLine[3],
+    );
+    return [intersectionPt[0] + element.x, intersectionPt[1] + element.y];
+  }
+  console.error(`${element.type} intersection not implemented.`);
+  // probably not necessary to throw an error
+  // return the input point unchanged
+  return [x, y];
+}
+
 const pointInBezierEquation = (
   p0: Point,
   p1: Point,
@@ -328,4 +410,25 @@ const hitTestRoughShape = (
 
     return false;
   });
+};
+
+const getClosestLine = (lines: number[][], x: number, y: number) => {
+  let minDistance = Infinity;
+  let closestLine = lines[0];
+  lines.forEach((line) => {
+    // extract the line closest to point (x, y)
+    const distance = distanceBetweenPointAndSegment(
+      x,
+      y,
+      line[0],
+      line[1],
+      line[2],
+      line[3],
+    );
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestLine = line;
+    }
+  });
+  return closestLine;
 };

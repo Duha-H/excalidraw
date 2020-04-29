@@ -14,6 +14,7 @@ export {
   getElementAtPosition,
   getElementContainingPosition,
   hasText,
+  getSurfaceIntersection,
 } from "./comparisons";
 export { getZoomOrigin, getNormalizedZoom } from "./zoom";
 export { globalSceneState } from "./globalScene";

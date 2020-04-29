@@ -25,7 +25,7 @@ export {
   handlerRectanglesFromCoords,
   handlerRectangles,
 } from "./handlerRectangles";
-export { hitTest } from "./collision";
+export { hitTest, getSurfaceHitPoint } from "./collision";
 export {
   resizeTest,
   getCursorForResizingElement,

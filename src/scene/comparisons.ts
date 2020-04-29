@@ -3,7 +3,11 @@ import {
   NonDeletedExcalidrawElement,
 } from "../element/types";
 
-import { getElementAbsoluteCoords, hitTest } from "../element";
+import {
+  getElementAbsoluteCoords,
+  hitTest,
+  getSurfaceHitPoint,
+} from "../element";
 import { AppState } from "../types";
 
 export const hasBackground = (type: string) =>
@@ -61,4 +65,13 @@ export function getElementContainingPosition(
     }
   }
   return hitElement;
+}
+
+export function getSurfaceIntersection(
+  element: NonDeletedExcalidrawElement,
+  x: number,
+  y: number,
+  zoom: number,
+): [number, number] {
+  return getSurfaceHitPoint(element, x, y, zoom);
 }
